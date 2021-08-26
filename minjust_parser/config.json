@@ -1,0 +1,11 @@
+{
+	"rucaptcha_api_key": "ad21a04ad13efe8cbbdf212789ce59b0",
+	"start_page_number": 277,
+	"end_page_number": 278,
+	"proxies": [
+		"https://arturkontopol_gmail_:88256da026@45.148.155.123:30001",
+        "https://arturkontopol_gmail_:88256da026@45.148.154.32:30001",
+        "https://arturkontopol_gmail_:88256da026@45.148.154.105:30001"
+	],
+	"geckodriver_path": "E:\\Python\\freelance\\minjust_parser\\geckodriver.exe"
+}
