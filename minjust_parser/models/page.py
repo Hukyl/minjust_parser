@@ -3,8 +3,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common import exceptions
+from twocaptcha import TwoCaptcha
 
 from utils.url import Url
+from .logger import Logger
 from settings import *
 from .locator import *
 
@@ -44,7 +46,7 @@ class BasePage(object):
 
 
 class RegistryPage(BasePage):
-    URL = ParserSettings.REGISTRY_URL
+    URL = Url('https://usr.minjust.gov.ua/content/free-search')
     LOCATORS = RegistryPageLocators
 
     def enter_name(self, value:str):
@@ -66,7 +68,8 @@ class RegistryPage(BasePage):
         return True
 
     def solve_captcha(self):
-        client = ParserSettings.RUCAPTCHA_CLIENT
+        client = TwoCaptcha(JsonSettings.rucaptcha_api_key)
+        logger = Logger()
         sitekey = Url(self.captcha_iframe.get_attribute('src')).params['k']
         for _ in range(3):
             try:
@@ -75,18 +78,18 @@ class RegistryPage(BasePage):
                     url=str(self.URL)
                 )['code']
             except Exception:
-                LoggerSettings.LOGGER.warning(
+                logger.warning(
                     "Failed solving captcha, trying again..."
                 )
             else:
                 break
         else:
-            LoggerSettings.LOGGER.error('Failed to solve captcha')
+            logger.error('Failed to solve captcha')
             raise ValueError('failed to solve captcha')
 
 
 class CatalogPage(BasePage):
-    URL = ParserSettings.CATALOG_URL
+    URL = Url('https://youcontrol.com.ua/catalog/kved/79/11/{}')
     LOCATORS = CatalogPageLocators
 
     def __init__(self, *args, **kwargs):

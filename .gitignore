@@ -10,6 +10,8 @@ __pycache__/
 # exe
 *.exe
 
+*.xls
+*.xlsx
 
 # Distribution / packaging
 .Python

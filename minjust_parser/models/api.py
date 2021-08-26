@@ -1,6 +1,6 @@
 import requests
 
-from settings import *
+from utils.url import Url
 
 
 class BaseApi(object):
@@ -24,7 +24,10 @@ class BaseApi(object):
 
 
 class RegistrySearchApi(BaseApi):
-    URL = ParserSettings.API_SEARCH_URL
+    URL = Url(
+        'https://usr.minjust.gov.ua/USRWebAPI/api/public/'
+        'search?person={person}&c={c}'
+    )
 
     @staticmethod
     def get_rfid(response: dict):
@@ -33,7 +36,9 @@ class RegistrySearchApi(BaseApi):
 
 
 class RegistryDetailApi(BaseApi):
-    URL = ParserSettings.API_DETAIL_URL
+    URL = Url(
+        'https://usr.minjust.gov.ua/USRWebAPI/api/public/detail?rfId={rfId}'
+    )
 
     @staticmethod
     def get_phone_numbers(response: dict):
