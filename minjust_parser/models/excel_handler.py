@@ -14,8 +14,8 @@ class ExcelHandler(object):
         self.last_row = 1
         self.wb = Workbook()
         title = (
-            f'{settings.ParserSettings.START_PAGE_NUMBER}-'
-            f'{settings.ParserSettings.END_PAGE_NUMBER}, '
+            f'{settings.JsonSettings.START_PAGE_NUMBER}-'
+            f'{settings.JsonSettings.END_PAGE_NUMBER}, '
             f"{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}"
         )
         last_ws = self.wb[self.wb.sheetnames[-1]]

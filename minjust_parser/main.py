@@ -6,6 +6,7 @@ from models.driver import Driver
 from models.page import (
     EntepreneurPage, AgentPage, CompanyPage, RegistryPage, CatalogPage
 )
+from models.logger import Logger
 from models.api import RegistryDetailApi, RegistrySearchApi
 import settings
 from utils import is_valid_phone, cycle
@@ -13,7 +14,8 @@ from utils import is_valid_phone, cycle
 
 driver = Driver()
 excel_handler = ExcelHandler()
-proxies = cycle(settings.ParserSettings.PROXIES)
+logger = Logger()
+proxies = cycle(settings.JsonSettings.PROXIES)
 
 catalog_page = CatalogPage(driver)
 registry_page = RegistryPage(driver)
@@ -44,7 +46,7 @@ def write_person():
         try:
             person_rfid = RegistrySearchApi.get_rfid(search_response)
         except KeyError:
-            settings.LoggerSettings.LOGGER.error(
+            logger.error(
                 "couldn't parse person id, the captcha took too long"
             )
             return
@@ -62,9 +64,7 @@ def write_person():
             return
         phone_numbers = [phone_number]
     else:
-        settings.LoggerSettings.LOGGER.warning(
-            'Unknown agent type, skipping...'
-        )
+        logger.warning('Unknown agent type, skipping...')
         return
     excel_handler.insert_data((phone_numbers, short_name))
     excel_handler.save()
@@ -74,8 +74,8 @@ driver.open_new_tab()
 driver.switch_tab(0)
 
 for page_number in range(
-        settings.ParserSettings.START_PAGE_NUMBER, 
-        settings.ParserSettings.END_PAGE_NUMBER
+        settings.JsonSettings.START_PAGE_NUMBER, 
+        settings.JsonSettings.END_PAGE_NUMBER
     ):
     catalog_page.set_page(page_number)
     for link in catalog_page.get_table_links():
@@ -84,6 +84,6 @@ for page_number in range(
         driver.get(registry_page.URL)
         driver.switch_tab(0)
         catalog_page.set_page(page_number)
-        write_person()     
+        write_person()
     else:
         print(f'Page {page_number} covered')
