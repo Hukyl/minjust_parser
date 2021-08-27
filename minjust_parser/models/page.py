@@ -6,7 +6,6 @@ from selenium.common import exceptions
 from twocaptcha import TwoCaptcha
 
 from utils.url import Url
-from .logger import Logger
 from settings import *
 from .locator import *
 
@@ -69,7 +68,6 @@ class RegistryPage(BasePage):
 
     def solve_captcha(self):
         client = TwoCaptcha(JsonSettings.rucaptcha_api_key)
-        logger = Logger()
         sitekey = Url(self.captcha_iframe.get_attribute('src')).params['k']
         for _ in range(3):
             try:
@@ -78,13 +76,10 @@ class RegistryPage(BasePage):
                     url=str(self.URL)
                 )['code']
             except Exception:
-                logger.warning(
-                    "Failed solving captcha, trying again..."
-                )
+                pass
             else:
                 break
         else:
-            logger.error('Failed to solve captcha')
             raise ValueError('failed to solve captcha')
 
 
