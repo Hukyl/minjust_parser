@@ -7,5 +7,6 @@
         "https://arturkontopol_gmail_:88256da026@45.148.154.32:30001",
         "https://arturkontopol_gmail_:88256da026@45.148.154.105:30001"
 	],
+	"page_open_wait_time": 10,
 	"geckodriver_path": "E:\\Python\\freelance\\minjust_parser\\geckodriver.exe"
 }
