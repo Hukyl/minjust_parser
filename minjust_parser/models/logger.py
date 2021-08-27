@@ -1,8 +1,6 @@
 import os
 from datetime import datetime as dt
 
-from termcolor import cprint
-
 from utils import SingletonMetaClass
 import settings
 
@@ -17,10 +15,8 @@ WARNING = WARN = 'warning'
 class Logger(metaclass=SingletonMetaClass):
     MAX_SIZE = 100 * 1024  # bytes
     LOG_LEVELS = {
-        'error': {'color': 'red', 'level': 40},
-        'warning': {'color': 'yellow', 'level': 30},
-        'info': {'color': 'cyan', 'level': 20},
-        'debug': {'color': 'green', 'level': 10}
+        'error': 40, 'warning': 30,
+        'info': 20, 'debug': 10
     }
 
     def __init__(self, log_level:str=settings.LoggerSettings.LOG_LEVEL):
@@ -78,14 +74,14 @@ class Logger(metaclass=SingletonMetaClass):
         assert (
             info := self.LOG_LEVELS.get(kind.lower())
         ) is not None, "unsupported message kind"
-        if self.LOG_LEVELS[self.log_level]['level'] <= info['level']:
+        if self.LOG_LEVELS[self.log_level] <= info:
             message = (
                 f"[{dt.utcnow().strftime('%Y-%m-%d %H:%M:%S')}] "
                 f"[{kind.upper()}] {message}"
             )
             self.logfile.write(message + "\n")
             self.logfile.flush()
-            cprint(message, info['color'])
+            print(message)
             if not self.logfile_size_ok:
                 self.update_logfile()
 

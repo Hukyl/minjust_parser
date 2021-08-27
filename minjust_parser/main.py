@@ -73,12 +73,18 @@ def write_person():
 driver.open_new_tab()
 driver.switch_tab(0)
 
+breakpoint()
+
 for page_number in range(
         settings.JsonSettings.START_PAGE_NUMBER, 
         settings.JsonSettings.END_PAGE_NUMBER
     ):
     catalog_page.set_page(page_number)
-    for link in catalog_page.get_table_links():
+    links = catalog_page.get_table_links()
+    if not links:
+        logger.error('403 Forbidden')
+        continue
+    for link in links:
         driver.set_proxy(next(proxies))
         driver.switch_tab(1)
         driver.get(registry_page.URL)
@@ -88,4 +94,5 @@ for page_number in range(
     else:
         logger.info(f'Page {page_number} covered')
 else:
+    driver.quit()
     input('Press Enter to exit...')
