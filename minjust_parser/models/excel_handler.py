@@ -47,8 +47,9 @@ class ExcelHandler(object):
                 n += 1
             length += 1
 
-    def check_sheet_empty(self, sheet):
-        return sheet["A1"].value is not None
+    @staticmethod
+    def check_sheet_empty(sheet):
+        return sheet["A1"].value is None
 
     def save(self):
         self.wb.save(filename=self.file_name)

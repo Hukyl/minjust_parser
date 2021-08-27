@@ -15,7 +15,7 @@ class AgentType(Enum):
 
 
 class LoggerSettings(object):
-    LOG_LEVEL = 'warning'
+    LOG_LEVEL = 'info'
 
 
 class ExcelSettings(object):
