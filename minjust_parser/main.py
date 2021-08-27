@@ -87,3 +87,5 @@ for page_number in range(
         write_person()
     else:
         logger.info(f'Page {page_number} covered')
+else:
+    input('Press Enter to exit...')
