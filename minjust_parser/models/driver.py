@@ -4,6 +4,7 @@ from typing import Optional, Union
 
 from seleniumwire import webdriver
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import settings
 from utils.url import Url
@@ -45,8 +46,11 @@ class Driver(webdriver.Firefox):
         fp = webdriver.FirefoxProfile()
         fp.accept_untrusted_certs = True
         fp.DEFAULT_PREFERENCES["frozen"]["browser.link.open_newwindow"] = 3
+        capabilities = DesiredCapabilities.FIREFOX.copy()
+        capabilities['acceptInsecureCerts'] = True
         super().__init__(
             *args,
+            capabilities=capabilities,
             firefox_profile=fp,
             executable_path=settings.FirefoxData.PATH, 
             options=options,
