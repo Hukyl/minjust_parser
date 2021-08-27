@@ -86,4 +86,4 @@ for page_number in range(
         catalog_page.set_page(page_number)
         write_person()
     else:
-        print(f'Page {page_number} covered')
+        logger.info(f'Page {page_number} covered')
