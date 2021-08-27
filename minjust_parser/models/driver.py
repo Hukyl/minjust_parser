@@ -42,8 +42,12 @@ class Driver(webdriver.Firefox):
                 'no_proxy': 'localhost,127.0.0.1,dev_server:8080'
             }
         }
+        fp = webdriver.FirefoxProfile()
+        fp.accept_untrusted_certs = True
+        fp.DEFAULT_PREFERENCES["frozen"]["browser.link.open_newwindow"] = 3
         super().__init__(
             *args,
+            firefox_profile=fp,
             executable_path=settings.FirefoxData.PATH, 
             options=options,
             service_log_path=service_log_path,
