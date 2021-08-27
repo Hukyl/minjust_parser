@@ -15,7 +15,7 @@ from utils import is_valid_phone, cycle
 driver = Driver()
 excel_handler = ExcelHandler()
 logger = Logger()
-proxies = cycle(settings.JsonSettings.PROXIES)
+proxies = cycle(settings.JsonSettings.PROXIES or [''])
 
 catalog_page = CatalogPage(driver)
 registry_page = RegistryPage(driver)
@@ -73,8 +73,6 @@ def write_person():
 driver.open_new_tab()
 driver.switch_tab(0)
 
-breakpoint()
-
 for page_number in range(
         settings.JsonSettings.START_PAGE_NUMBER, 
         settings.JsonSettings.END_PAGE_NUMBER
@@ -90,6 +88,7 @@ for page_number in range(
         driver.get(registry_page.URL)
         driver.switch_tab(0)
         catalog_page.set_page(page_number)
+        sleep(settings.JsonSettings.PAGE_OPEN_WAIT_TIME)
         write_person()
     else:
         logger.info(f'Page {page_number} covered')

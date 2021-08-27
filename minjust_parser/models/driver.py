@@ -39,7 +39,6 @@ class Driver(webdriver.Firefox):
                 options.add_argument('--disable-dev-shm-usage')
         seleniumwire_options = {
             'proxy': {
-                'https': 'https://arturkontopol_gmail_:88256da026@45.148.154.32:30001',
                 'no_proxy': 'localhost,127.0.0.1,dev_server:8080'
             }
         }
@@ -62,7 +61,10 @@ class Driver(webdriver.Firefox):
         return super().get(url)
 
     def set_proxy(self, proxy:str):
-        self.proxy['https'] = proxy
+        if not proxy:
+            self.proxy.pop('https', None)
+        else:
+            self.proxy['https'] = proxy
         return True
 
     def open_new_tab(self):
