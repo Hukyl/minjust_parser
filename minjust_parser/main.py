@@ -9,7 +9,7 @@ from models.page import (
 from models.logger import Logger
 from models.api import RegistryDetailApi, RegistrySearchApi
 import settings
-from utils import is_valid_phone, cycle
+from utils import is_valid_phone, cycle, is_ok_status_code
 
 
 driver = Driver()
@@ -21,9 +21,33 @@ catalog_page = CatalogPage(driver)
 registry_page = RegistryPage(driver)
 
 
-def write_person():
+def swap_proxies_until_ok(func):
+    def inner(*args, **kwargs):
+        for _ in range(len(settings.JsonSettings.PROXIES)):
+            result = func(*args, **kwargs)
+            for request in driver.requests:
+                if (response := request.response):
+                    break
+            else:
+                logger.warning(
+                    'No successful requests, proxy is not being changed...'
+                )
+                continue
+            if is_ok_status_code(response.status_code):
+                return result
+            else: 
+                logger.error('403 Forbidden')
+                driver.set_proxy(next(proxies))
+        else:
+            logger.error('All proxies are banned, quitting...')
+            quit(1)
+    return inner
+
+
+
+def write_person(link):
     agent_type = catalog_page.get_link_agent_type(link)
-    driver.get(link)
+    swap_proxies_until_ok(driver.get)(link)
     page = AgentPage(driver)
     if not page.is_active:
         return
@@ -39,6 +63,7 @@ def write_person():
         try:
             solved_recaptcha_token = registry_page.solve_captcha()
         except ValueError:
+            logger.error("Failed to solve captcha, skipping to next person...")
             return
         search_response = RegistrySearchApi.get(
             {'person': quote(full_name), 'c': solved_recaptcha_token}
@@ -78,18 +103,14 @@ for page_number in range(
         settings.JsonSettings.END_PAGE_NUMBER
     ):
     catalog_page.set_page(page_number)
-    links = catalog_page.get_table_links()
-    if not links:
-        logger.error('403 Forbidden')
-        continue
-    for link in links:
+    for link in catalog_page.get_table_links():
         driver.set_proxy(next(proxies))
         driver.switch_tab(1)
         driver.get(registry_page.URL)
         driver.switch_tab(0)
-        catalog_page.set_page(page_number)
+        swap_proxies_until_ok(catalog_page.set_page)(page_number)
         sleep(settings.JsonSettings.PAGE_OPEN_WAIT_TIME)
-        write_person()
+        write_person(link)
     else:
         logger.info(f'Page {page_number} covered')
 else:
