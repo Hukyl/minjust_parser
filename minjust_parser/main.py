@@ -102,13 +102,12 @@ for page_number in range(
         settings.JsonSettings.START_PAGE_NUMBER, 
         settings.JsonSettings.END_PAGE_NUMBER
     ):
-    catalog_page.set_page(page_number)
+    swap_proxies_until_ok(catalog_page.set_page)(page_number)
     for link in catalog_page.get_table_links():
         driver.set_proxy(next(proxies))
         driver.switch_tab(1)
         driver.get(registry_page.URL)
         driver.switch_tab(0)
-        swap_proxies_until_ok(catalog_page.set_page)(page_number)
         sleep(settings.JsonSettings.PAGE_OPEN_WAIT_TIME)
         write_person(link)
     else:
