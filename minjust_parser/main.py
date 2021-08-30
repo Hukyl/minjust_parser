@@ -25,8 +25,9 @@ def swap_proxies_until_ok(func):
     def inner(*args, **kwargs):
         for _ in range(len(settings.JsonSettings.PROXIES)):
             result = func(*args, **kwargs)
-            for request in driver.requests:
-                if (response := request.response):
+            for request in driver.requests[::-1]:
+                if request.url == driver.current_url:
+                    response = request.response
                     break
             else:
                 logger.warning(
@@ -74,6 +75,9 @@ def write_person(link):
             logger.error(
                 "couldn't parse person id, the captcha took too long"
             )
+            return
+        except IndexError:
+            logger.error('no such record in the registry')
             return
         detail_response = RegistryDetailApi.get({'rfId': quote(person_rfid)})
         phone_numbers = RegistryDetailApi.get_phone_numbers(detail_response)
