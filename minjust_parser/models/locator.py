@@ -19,34 +19,32 @@ class RegistryPageLocators(object):
     NAME_INPUT = (By.CSS_SELECTOR, 'input[type=text]', False)
     SEARCH_BUTTON = (By.CSS_SELECTOR, 'button[type=submit]', False)
 
+# (CSS Selector, Is multiple)
 
 
-class CatalogPageLocators(object):
+class CatalogRequestsPageLocators(object):
     CATALOG_TABLE_ELEMENTS = (
-        By.CSS_SELECTOR, 
-        'table#catalog-functiongroup-page > tbody > tr > td', 
+        'table#catalog-functiongroup-page > tbody > tr > td > a', 
         True
     )
 
 
-class AgentPageLocators(object):
+class AgentRequestsPageLocators(object):
     FULL_NAME_SPAN = (
-        By.XPATH, 
-        '//*[@id="catalog-company-file"]/div[2]/div[1]/div[2]/span', 
-        False
+        '#catalog-company-file > div:nth-of-type(2) > div:nth-of-type(1) '
+        '> div:nth-of-type(2) > span', False
     )
     SHORT_NAME_SPAN = (
-        By.XPATH, 
-        '//*[@id="catalog-company-file"]/div[2]/div[2]/div[2]/span', 
-        False
+        '#catalog-company-file > div:nth-of-type(2) > div:nth-of-type(2)'
+        ' > div:nth-of-type(2) > span', False
     )
-    STATUS_SPAN = (By.CSS_SELECTOR, 'span.status-green-seo', False)
-    PHONE_TD = (By.CSS_SELECTOR, 'td.phone', False)
+    STATUS_SPAN = ('span.status-green-seo', False)
+    PHONE_TD = ('td.phone', False)
 
 
-class EntepreneurPageLocators(AgentPageLocators):
+class EntepreneurRequestsPageLocators(AgentRequestsPageLocators):
     pass
 
 
-class CompanyPageLocators(AgentPageLocators):
-    PHONE_TD = (By.CSS_SELECTOR, 'a.phone-catalog-style', False)
+class CompanyRequestsPageLocators(AgentRequestsPageLocators):
+    PHONE_TD = ('a.phone-catalog-style', False)

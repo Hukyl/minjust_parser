@@ -1,10 +1,6 @@
 from collections.abc import Iterable
 
 
-def is_ok_status_code(code:int):
-    return code in range(100, 400)
-
-
 def is_valid_phone(phone:str):
     phone = phone.strip()
     for symbol in ['+', ' ', '-', '(', ')']:
