@@ -2,17 +2,20 @@ from datetime import datetime
 import string
 import itertools
 
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 
 import settings
 
 
 
 class ExcelHandler(object):
-    def __init__(self, file_name:str=settings.ExcelSettings.FILENAME):
-        self.file_name = file_name.rstrip('.xlsx') + '.xlsx'
+    def __init__(self, filename:str=settings.ExcelSettings.FILENAME):
+        self.filename = filename.rstrip('.xlsx') + '.xlsx'
         self.last_row = 1
-        self.wb = Workbook()
+        try:
+            self.wb = load_workbook(filename)
+        except FileNotFoundError:
+            self.wb = Workbook()
         title = (
             f'{settings.JsonSettings.START_PAGE_NUMBER}-'
             f'{settings.JsonSettings.END_PAGE_NUMBER}, '
@@ -52,4 +55,4 @@ class ExcelHandler(object):
         return sheet["A1"].value is None
 
     def save(self):
-        self.wb.save(filename=self.file_name)
+        self.wb.save(filename=self.filename)
