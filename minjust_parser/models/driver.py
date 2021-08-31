@@ -11,6 +11,8 @@ from utils.url import Url
 
 
 class Driver(webdriver.Firefox):
+    NO_PROXY_URL = 'localhost,127.0.0.1,dev_server:8080'
+
     def __init__(
             self, *args, 
             headless:Optional[bool]=settings.FirefoxData.HEADLESS, **kwargs
@@ -38,11 +40,7 @@ class Driver(webdriver.Firefox):
             if sys.platform == 'linux':
                 options.add_argument("--no-sandbox")
                 options.add_argument('--disable-dev-shm-usage')
-        seleniumwire_options = {
-            'proxy': {
-                'no_proxy': 'localhost,127.0.0.1,dev_server:8080'
-            }
-        }
+        seleniumwire_options = {'proxy': {'no_proxy': self.NO_PROXY_URL}}
         fp = webdriver.FirefoxProfile()
         fp.accept_untrusted_certs = True
         fp.DEFAULT_PREFERENCES["frozen"]["browser.link.open_newwindow"] = 3
@@ -70,9 +68,12 @@ class Driver(webdriver.Firefox):
 
     def set_proxy(self, proxy:str):
         if not proxy:
-            self.proxy.pop('https', None)
+            self.proxy = {'no_proxy': self.NO_PROXY_URL}
         else:
-            self.proxy['https'] = proxy
+            self.proxy = {
+                'no_proxy': self.NO_PROXY_URL,
+                'https': proxy
+            }
         return True
 
     def open_new_tab(self):
