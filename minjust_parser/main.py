@@ -84,6 +84,7 @@ def write_person(link):
         phone_numbers = [x for x in phone_numbers if is_valid_phone(x)]
         if not phone_numbers:
             return
+        record_data = (phone_numbers, full_name)
     elif agent_type is settings.AgentType.Company:
         page = CompanyPage(driver)
         if not page.has_phone_number:
@@ -91,11 +92,11 @@ def write_person(link):
         phone_number = page.get_phone_number() 
         if not is_valid_phone(phone_number):
             return
-        phone_numbers = [phone_number]
+        record_data = ([phone_number], short_name)
     else:
         logger.warning('Unknown agent type, skipping...')
         return
-    excel_handler.insert_data((phone_numbers, short_name))
+    excel_handler.insert_data(record_data)
     excel_handler.save()
 
 
