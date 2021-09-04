@@ -1,15 +1,19 @@
 from time import sleep
 from urllib.parse import quote
 
+import requests
+
 from models.excel_handler import ExcelHandler
 from models.driver import Driver
-from models.page import (
-    EntepreneurPage, AgentPage, CompanyPage, RegistryPage, CatalogPage
+from models.page import RegistryPage
+from models.requests_page import (
+    EntepreneurRequestsPage, CompanyRequestsPage, 
+    CatalogRequestsPage
 )
 from models.logger import Logger
 from models.api import RegistryDetailApi, RegistrySearchApi
 import settings
-from utils import is_valid_phone, cycle, is_ok_status_code
+from utils import is_valid_phone, cycle
 
 
 driver = Driver()
@@ -17,47 +21,35 @@ excel_handler = ExcelHandler()
 logger = Logger()
 proxies = cycle(settings.JsonSettings.PROXIES or [''])
 
-catalog_page = CatalogPage(driver)
+catalog_page = CatalogRequestsPage()
 registry_page = RegistryPage(driver)
 
 
-def swap_proxies_until_ok(func):
-    def inner(*args, **kwargs):
-        for _ in range(len(settings.JsonSettings.PROXIES)):
-            result = func(*args, **kwargs)
-            for request in driver.requests[::-1]:
-                if request.url == driver.current_url:
-                    response = request.response
-                    break
-            else:
-                logger.warning(
-                    'No successful requests, proxy is not being changed...'
-                )
-                continue
-            if is_ok_status_code(response.status_code):
-                return result
-            else: 
-                logger.error('403 Forbidden')
-                driver.set_proxy(next(proxies))
+def update_soup_safe(page):
+    page.set_proxy(next(proxies))
+    for _ in range(len(settings.JsonSettings.PROXIES)):
+        try:
+            soup = page.get()
+        except requests.exceptions.HTTPError:
+            logger.error('403 Forbidden')
+            page.set_proxy(next(proxies))
         else:
-            logger.error('All proxies are banned, quitting...')
-            quit(1)
-    return inner
+            return soup
+    else:
+        logger.error('All proxies are banned, quitting...')
+        quit(1)
 
 
 
-def write_person(link):
-    agent_type = catalog_page.get_link_agent_type(link)
-    swap_proxies_until_ok(driver.get)(link)
-    page = AgentPage(driver)
+def write_person(page):
+    update_soup_safe(page)
     if not page.is_active:
         return
     full_name = page.get_full_name()
     short_name = page.get_short_name()
-    if agent_type is settings.AgentType.Enterpreneur:
-        page = EntepreneurPage(driver)
-        driver.switch_tab(1)
-        registry_page.select_radiobutton(agent_type)
+    if isinstance(page, EntepreneurRequestsPage):
+        driver.get(registry_page.URL)
+        registry_page.select_radiobutton(settings.AgentType.Enterpreneur)
         registry_page.enter_name(full_name)
         registry_page.click_search_button()
         sleep(5)
@@ -84,37 +76,31 @@ def write_person(link):
         phone_numbers = [x for x in phone_numbers if is_valid_phone(x)]
         if not phone_numbers:
             return
-        record_data = (phone_numbers, full_name)
-    elif agent_type is settings.AgentType.Company:
-        page = CompanyPage(driver)
+        data = (phone_numbers, full_name)
+    elif isinstance(page, CompanyRequestsPage):
         if not page.has_phone_number:
             return
         phone_number = page.get_phone_number() 
         if not is_valid_phone(phone_number):
             return
-        record_data = ([phone_number], short_name)
+        data = ([phone_number], short_name)
     else:
         logger.warning('Unknown agent type, skipping...')
         return
-    excel_handler.insert_data(record_data)
+    excel_handler.insert_data(data)
     excel_handler.save()
 
-
-driver.open_new_tab()
-driver.switch_tab(0)
 
 for page_number in range(
         settings.JsonSettings.START_PAGE_NUMBER, 
         settings.JsonSettings.END_PAGE_NUMBER
     ):
-    swap_proxies_until_ok(catalog_page.set_page)(page_number)
-    for link in catalog_page.get_table_links():
+    catalog_page.page_number = page_number
+    update_soup_safe(catalog_page)
+    for page in catalog_page.get_table_pages():
         driver.set_proxy(next(proxies))
-        driver.switch_tab(1)
-        driver.get(registry_page.URL)
-        driver.switch_tab(0)
         sleep(settings.JsonSettings.PAGE_OPEN_WAIT_TIME)
-        write_person(link)
+        write_person(page)
     else:
         logger.info(f'Page {page_number} covered')
 else:
