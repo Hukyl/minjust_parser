@@ -1,5 +1,6 @@
 from time import sleep
 from urllib.parse import quote
+from urllib3.exceptions import MaxRetryError as HTTP502Error
 
 import requests
 
@@ -26,13 +27,14 @@ registry_page = RegistryPage(driver)
 
 
 def update_soup_safe(page):
-    page.set_proxy(next(proxies))
     for _ in range(len(settings.JsonSettings.PROXIES)):
+        page.set_proxy(next(proxies))
         try:
             soup = page.get()
         except requests.exceptions.HTTPError:
             logger.error('403 Forbidden')
-            page.set_proxy(next(proxies))
+        except HTTP502Error:
+            logger.error('502 status code: ')
         else:
             return soup
     else:

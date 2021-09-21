@@ -1,25 +1,19 @@
-from selenium.webdriver.common.by import By
-
-# (Type, Identifier, Is multiple)
+# (CSS Selector, Is multiple)
 
 
 class RegistryPageLocators(object):
-    CAPTCHA_IFRAME = (
-        By.XPATH, '//*[@id="ngrecaptcha-0"]/div/div/iframe', False
-    )
-    ENTERPRENEUR_RADIOBUTTON = (
-        By.XPATH, '//div[@role="radiogroup"]/div[1]/label/input', False
+    CAPTCHA_IFRAME = ('#ngrecaptcha-0 > div > div > iframe', False)
+    ENTERPRENEUR_RADIOBUTTON = ( 
+        'div[role=radiogroup] > div:nth-of-type(1) > label > input', False
     )
     COMPANY_RADIOBUTTON = (
-        By.XPATH, '//div[@role="radiogroup"]/div[2]/label/input', False
+        'div[role=radiogroup] > div:nth-of-type(2) > label > input', False
     )
     SPECIAL_RADIOBUTTON = (
-        By.XPATH, '//div[@role="radiogroup"]/div[3]/label/input', False
+        'div[role=radiogroup] > div:nth-of-type(3) > label > input', False
     )
-    NAME_INPUT = (By.CSS_SELECTOR, 'input[type=text]', False)
-    SEARCH_BUTTON = (By.CSS_SELECTOR, 'button[type=submit]', False)
-
-# (CSS Selector, Is multiple)
+    NAME_INPUT = ('input[type=text]', False)
+    SEARCH_BUTTON = ('button[type=submit]', False)
 
 
 class CatalogRequestsPageLocators(object):
