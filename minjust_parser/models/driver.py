@@ -76,15 +76,6 @@ class Driver(webdriver.Firefox):
             }
         return True
 
-    def open_new_tab(self):
-        self.execute_script("window.open('', '_blank');")
-        self.switch_tab(1)
-        return True
-
-    def switch_tab(self, index:int):
-        self.switch_to.window(self.window_handles[index])
-        return True
-
     def __del__(self):
         try:
             self.quit()

@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup as bs
 
 from utils.url import Url
 from settings import *
-from .locator import *
+from .locators import *
 
 
 class BaseRequestsPage(ABC):
@@ -21,7 +21,7 @@ class BaseRequestsPage(ABC):
             "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0"
         )}
         self.proxies = {}
-        self.soup = None
+        self._soup = None
 
     def __getattr__(self, attr):
         if hasattr(self.LOCATORS, attr.upper()):

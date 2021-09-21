@@ -1,23 +1,29 @@
+from abc import ABC
+
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from twocaptcha import TwoCaptcha
 
 from utils.url import Url
 from settings import *
-from .locator import *
+from .locators import *
+from ..driver import Driver
 
 
-
-class BasePage(object):
+class BasePage(ABC):
     """
     Base class to initialize the base page that will be called from all
     pages
     """
-    URL = object
+    URL_TEMPLATE = object
     LOCATORS = object
 
-    def __init__(self, driver):
+    def URL(self):
+        return self.URL_TEMPLATE
+
+    def __init__(self, driver: Driver):
         self.driver = driver
 
     def __getattr__(self, attr):
@@ -33,17 +39,19 @@ class BasePage(object):
         webelement.send_keys(value)
         return True
 
-    def get_webelement(self, locator: tuple[str, str, bool]):
-        *locator, is_multiple = locator
+    def get_webelement(self, locator: tuple[str, bool]):
+        selector, is_multiple = locator
         func = (
             EC.presence_of_all_elements_located if is_multiple else 
             EC.presence_of_element_located
         )
-        return WebDriverWait(self.driver, 3).until(func(locator))
+        return WebDriverWait(self.driver, 3).until(
+            func((By.CSS_SELECTOR, selector))
+        )
 
 
 class RegistryPage(BasePage):
-    URL = Url('https://usr.minjust.gov.ua/content/free-search')
+    URL_TEMPLATE = Url('https://usr.minjust.gov.ua/content/free-search')
     LOCATORS = RegistryPageLocators
 
     def enter_name(self, value:str):
