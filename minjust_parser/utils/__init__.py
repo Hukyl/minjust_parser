@@ -1,6 +1,10 @@
 from collections.abc import Iterable
 
 
+class Null(object):
+    pass
+
+
 def is_valid_phone(phone:str):
     phone = phone.strip()
     for symbol in ['+', ' ', '-', '(', ')']:

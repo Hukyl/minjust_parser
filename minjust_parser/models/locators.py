@@ -16,14 +16,14 @@ class RegistryPageLocators(object):
     SEARCH_BUTTON = ('button[type=submit]', False)
 
 
-class CatalogRequestsPageLocators(object):
+class CatalogPageLocators(object):
     CATALOG_TABLE_ELEMENTS = (
         'table#catalog-functiongroup-page > tbody > tr > td > a', 
         True
     )
 
 
-class AgentRequestsPageLocators(object):
+class AgentPageLocators(object):
     FULL_NAME_SPAN = (
         '#catalog-company-file > div:nth-of-type(2) > div:nth-of-type(1) '
         '> div:nth-of-type(2) > span', False
@@ -36,9 +36,9 @@ class AgentRequestsPageLocators(object):
     PHONE_TD = ('td.phone', False)
 
 
-class EntepreneurRequestsPageLocators(AgentRequestsPageLocators):
+class EntepreneurPageLocators(AgentPageLocators):
     pass
 
 
-class CompanyRequestsPageLocators(AgentRequestsPageLocators):
+class CompanyPageLocators(AgentPageLocators):
     PHONE_TD = ('a.phone-catalog-style', False)
