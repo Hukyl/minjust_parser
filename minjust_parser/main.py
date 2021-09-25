@@ -1,46 +1,49 @@
 from time import sleep
 from urllib.parse import quote
-from urllib3.exceptions import MaxRetryError as HTTP502Error
 
 import requests
 
 from models.excel_handler import ExcelHandler
-from models.driver import Driver
-from models.page import RegistryPage
-from models.requests_page import (
-    EntepreneurRequestsPage, CompanyRequestsPage, 
-    CatalogRequestsPage
+from models.drivers.web import WebDriver
+from models.drivers.request import RequestDriver
+from models.page import (
+    EntepreneurPage, CompanyPage, 
+    CatalogPage, RegistryPage
 )
 from models.logger import Logger
 from models.api import RegistryDetailApi, RegistrySearchApi
+from models.middleware import RequestMiddleware, WebMiddleware
 import settings
 from utils import is_valid_phone, cycle
 
 
-driver = Driver()
+driver = WebDriver()
 excel_handler = ExcelHandler()
 logger = Logger()
 proxies = cycle(settings.JsonSettings.PROXIES or [''])
 
-catalog_page = CatalogRequestsPage()
-registry_page = RegistryPage(driver)
+catalog_page = CatalogPage(
+    RequestMiddleware(RequestDriver(), CatalogPage.LOCATORS)
+)
+registry_page = RegistryPage(WebMiddleware(driver, RegistryPage.LOCATORS))
 
 
 def update_soup_safe(page):
     for _ in range(len(settings.JsonSettings.PROXIES)):
-        page.set_proxy(next(proxies))
+        page.middleware.set_proxy(next(proxies))
         try:
             soup = page.get()
         except requests.exceptions.HTTPError:
             logger.error('403 Forbidden')
-        except HTTP502Error:
-            logger.error('502 status code: ')
+        except OSError:
+            logger.error(
+                f'502 status code: proxy {page.middleware.proxy["https"]}'
+            )
         else:
             return soup
     else:
         logger.error('All proxies are banned, quitting...')
         quit(1)
-
 
 
 def write_person(page):
@@ -49,8 +52,8 @@ def write_person(page):
         return
     full_name = page.get_full_name()
     short_name = page.get_short_name()
-    if isinstance(page, EntepreneurRequestsPage):
-        driver.get(registry_page.URL)
+    if isinstance(page, EntepreneurPage):
+        registry_page.get()
         registry_page.select_radiobutton(settings.AgentType.Enterpreneur)
         registry_page.enter_name(full_name)
         registry_page.click_search_button()
@@ -79,7 +82,7 @@ def write_person(page):
         if not phone_numbers:
             return
         data = (phone_numbers, full_name)
-    elif isinstance(page, CompanyRequestsPage):
+    elif isinstance(page, CompanyPage):
         if not page.has_phone_number:
             return
         phone_number = page.get_phone_number() 
@@ -98,9 +101,13 @@ for page_number in range(
         settings.JsonSettings.END_PAGE_NUMBER
     ):
     catalog_page.page_number = page_number
+    breakpoint()
     update_soup_safe(catalog_page)
-    for page in catalog_page.get_table_pages():
-        driver.set_proxy(next(proxies))
+    for (agent_class, id_) in catalog_page.get_table_pages():
+        page = agent_class(
+            RequestMiddleware(RequestDriver(), agent_class.LOCATORS), id_
+        )
+        registry_page.middleware.set_proxy(next(proxies))
         sleep(settings.JsonSettings.PAGE_OPEN_WAIT_TIME)
         write_person(page)
     else:
