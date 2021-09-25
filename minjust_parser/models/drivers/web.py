@@ -5,12 +5,16 @@ from typing import Optional, Union
 from seleniumwire import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from bs4 import BeautifulSoup as bs, PageElement
 
 import settings
 from utils.url import Url
+from . import Driver
 
 
-class Driver(webdriver.Firefox):
+class WebDriver(webdriver.Firefox, Driver):
     NO_PROXY_URL = 'localhost,127.0.0.1,dev_server:8080'
 
     def __init__(
@@ -57,6 +61,61 @@ class Driver(webdriver.Firefox):
             **kwargs
         )
 
+    @staticmethod
+    def convert_to_css_selector(by, value: str):
+        if by == By.ID:
+            return '[id="%s"]' % value
+        elif by == By.TAG_NAME:
+            return value
+        elif by == By.CLASS_NAME:
+            return ".%s" % value
+        elif by == By.NAME:
+            return '[name="%s"]' % value
+        else:
+            return value
+
+    def _get_element(
+            self, element: PageElement) -> webdriver.Firefox._web_element_cls:
+        return super().find_element('css selector', element.css_selector)
+
+    def click(self, webelement: PageElement) -> True:
+        self._get_element(webelement).click()
+        return True
+
+    def enter_input(self, webelement: PageElement, value: str) -> True:
+        webelement = self._get_element(webelement)
+        webelement.click()
+        webelement.send_keys(Keys.HOME)
+        webelement.send_keys(Keys.SHIFT, Keys.END)
+        webelement.send_keys(Keys.BACKSPACE)
+        webelement.send_keys(value)
+        return True
+
+    def find_element(self, by=By.ID, value=None):
+        element = super().find_element(by, value)
+        element = bs(
+            element.get_attribute('outerHTML'), 'html.parser'
+        ).select_one('*')
+        element.css_selector = self.convert_to_css_selector(by, value)
+        return element
+
+    def find_elements(self, by=By.ID, value=None):
+        elements = super().find_elements(by, value)
+        css_selector = self.convert_to_css_selector(by, value)
+        elements = [
+            bs(
+                element.get_attribute('outerHTML'), 'html.parser'
+            ).select_one('*')
+            for element in elements
+        ]
+        for element in elements:
+            element.css_selector = css_selector
+        return elements
+
+    @property
+    def content(self):
+        return bs(self.page_source, 'html.parser')
+
     @property
     def url(self):
         return Url(self.current_url)
@@ -74,15 +133,6 @@ class Driver(webdriver.Firefox):
                 'no_proxy': self.NO_PROXY_URL,
                 'https': proxy
             }
-        return True
-
-    def open_new_tab(self):
-        self.execute_script("window.open('', '_blank');")
-        self.switch_tab(1)
-        return True
-
-    def switch_tab(self, index:int):
-        self.switch_to.window(self.window_handles[index])
         return True
 
     def __del__(self):
