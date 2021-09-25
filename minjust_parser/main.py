@@ -31,23 +31,15 @@ registry_page = RegistryPage(WebMiddleware(driver, RegistryPage.LOCATORS))
 
 def update_soup_safe(page):
     for _ in range(len(settings.JsonSettings.PROXIES)):
-<<<<<<< HEAD
-        page.set_proxy(next(proxies))
-=======
         page.middleware.set_proxy(next(proxies))
->>>>>>> dev-requests
         try:
             soup = page.get()
         except requests.exceptions.HTTPError:
             logger.error('403 Forbidden')
         except OSError:
-<<<<<<< HEAD
-            logger.error(f'502 error: {page.proxies.get("https", "no proxy")}')
-=======
             logger.error(
                 f'502 status code: proxy {page.middleware.proxy["https"]}'
             )
->>>>>>> dev-requests
         else:
             return soup
     else:
