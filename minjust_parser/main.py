@@ -97,11 +97,10 @@ def write_person(page):
 
 
 for page_number in range(
-        settings.JsonSettings.START_PAGE_NUMBER, 
-        settings.JsonSettings.END_PAGE_NUMBER
-    ):
+            settings.JsonSettings.START_PAGE_NUMBER, 
+            settings.JsonSettings.END_PAGE_NUMBER
+        ):
     catalog_page.page_number = page_number
-    breakpoint()
     update_soup_safe(catalog_page)
     for (agent_class, id_) in catalog_page.get_table_pages():
         page = agent_class(
