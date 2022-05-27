@@ -8,7 +8,7 @@ import settings
 
 
 
-class ExcelHandler(object):
+class ExcelHandler:
     def __init__(self, filename:str=settings.ExcelSettings.FILENAME):
         self.filename = filename.rstrip('.xlsx') + '.xlsx'
         self.last_row = 1
