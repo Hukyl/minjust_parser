@@ -1,0 +1,8 @@
+{
+	"rucaptcha_api_key": "",
+	"start_page_number": 1,
+	"end_page_number": 10,
+	"proxies": [""],
+	"page_open_wait_time": 7,
+	"geckodriver_path": ""
+}
