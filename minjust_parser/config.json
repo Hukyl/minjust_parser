@@ -2,14 +2,7 @@
 	"rucaptcha_api_key": "ad21a04ad13efe8cbbdf212789ce59b0",
 	"start_page_number": 244,
 	"end_page_number": 280,
-	"proxies": [
-		"https://hamziii112288ha:H4s4LeR@193.203.51.244:65223",
-		"https://sadsad:H4s4LeR@185.166.217.69:65223",
-		"https://hamziii112288ha:H4s4LeR@194.38.21.157:65223",
-		"https://hamziii112288ha:H4s4LeR@176.114.5.108:65223",
-		"https://hamziii112288ha:H4s4LeR@91.211.116.163:65223",
-		"https://hamziii112288ha:H4s4LeR@92.62.113.31:65223"		
-	],
+	"proxies": [""],
 	"page_open_wait_time": 7,
 	"geckodriver_path": "E:\\Python\\freelance\\minjust_parser\\geckodriver.exe"
 }

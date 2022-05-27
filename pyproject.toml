@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "minjust_parser"
+version = "1.0.0"
+description = ""
+authors = ["Hukyl <a.shalaev7125@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+selenium = "3.141.0"
+openpyxl = "3.0.7"
+requests = "2.26.0"
+selenium-wire = "4.5.2"
+2captcha-python = "^1.1.2"
+beautifulsoup4 = "4.9.3"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.13.9"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
