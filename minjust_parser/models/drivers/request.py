@@ -15,19 +15,19 @@ class RequestDriver(Driver):
         self.proxy = {}
         self.content: bs = None
 
-    def set_proxy(self, proxy:str):
+    def set_proxy(self, proxy: str):
         if not proxy:
             self.proxy = {}
         elif proxy.startswith('https:') or proxy.startswith('http:'):
             self.proxy['https'] = (
-                f"http://{proxy.lstrip('https://').lstrip('http://')}"
+                f"http://{proxy.partition('//')[2]}"
             )
         else:
             raise ValueError('invalid proxy')
 
     def get(self, url: Url):
         response = requests.get(
-            url, proxies=self.proxy, headers=self.headers
+            url.url, proxies=self.proxy, headers=self.headers
         )
         response.raise_for_status()
         self.url = url

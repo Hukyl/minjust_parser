@@ -1,21 +1,8 @@
 {
 	"rucaptcha_api_key": "ad21a04ad13efe8cbbdf212789ce59b0",
-	"start_page_number": 785,
-	"end_page_number": 840,
-	"proxies": [
-		"https://arturkontopol_gmail_:88256da026@45.13.193.177:30006",
-		"https://Selarturkontopol:P9t6FxB@176.114.8.7:45785",
-		"https://Selarturkontopol:P9t6FxB@185.166.219.186:45785",
-		"https://Selarturkontopol:P9t6FxB@91.217.91.182:45785",
-		"https://Selarturkontopol:P9t6FxB@193.203.49.215:45785",
-		"https://arturkontopol_gmail_:88256da026@45.148.155.123:30001",
-		"https://arturkontopol_gmail_:88256da026@45.148.154.32:30001",
-		"https://arturkontopol_gmail_:88256da026@45.148.154.105:30001",
-		"https://arturkontopol_gmail_:88256da026@192.144.10.28:30006",
-		"https://arturkontopol_gmail_:88256da026@192.144.11.117:30006",
-		"https://arturkontopol_gmail_:88256da026@192.144.8.224:30006",
-		"https://arturkontopol_gmail_:88256da026@45.13.193.125:30006"
-	],
+	"start_page_number": 244,
+	"end_page_number": 280,
+	"proxies": [""],
 	"page_open_wait_time": 7,
 	"geckodriver_path": "E:\\Python\\freelance\\minjust_parser\\geckodriver.exe"
 }
